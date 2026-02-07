@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Anime Power Battle</title>
+
+<style>
+body {
+    background: #0f0f1a;
+    color: white;
+    font-family: Arial, sans-serif;
+    text-align: center;
+}
+
+.menu {
+    display: none;
+}
+
+.active {
+    display: block;
+}
+
+button {
+    padding: 12px 20px;
+    margin: 8px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+button:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.power-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    max-width: 700px;
+    margin: auto;
+}
+
+.power {
+    background: #1e1e3f;
+    padding: 10px;
+    border: 1px solid #555;
+    cursor: pointer;
+}
+
+.hp {
+    font-size: 20px;
+    margin: 10px;
+}
+</style>
+</head>
+
+<body>
+
+<!-- MAIN MENU -->
+<div id="mainMenu" class="menu active">
+    <h1>🔥 Anime Power Battle 🔥</h1>
+    <button onclick="goToPowers()">Play</button><br>
+    <button disabled>Settings</button>
+</div>
+
+<!-- POWER SELECTION -->
+<div id="powerMenu" class="menu">
+    <h2>Select Your Power</h2>
+    <div class="power-grid" id="powers"></div>
+</div>
+
+<!-- MODE SELECTION -->
+<div id="modeMenu" class="menu">
+    <h2>Choose Mode</h2>
+    <button onclick="startAI()">VS AI</button>
+    <button onclick="startOnline()">Online Players</button><br>
+    <button disabled>Settings</button>
+</div>
+
+<!-- BATTLE -->
+<div id="battle" class="menu">
+    <h2>⚔️ Battle ⚔️</h2>
+    <div class="hp">Your HP: <span id="playerHP"></span></div>
+    <div class="hp">Enemy HP: <span id="enemyHP"></span></div>
+    <button onclick="attack()">Attack</button>
+</div>
+
+<!-- WIN -->
+<div id="win" class="menu">
+    <h1>🏆 YOU WIN!</h1>
+    <button onclick="goToPowers()">Continue</button>
+    <button onclick="restart()">Retry</button>
+    <button disabled>Settings</button>
+</div>
+
+<!-- LOSE -->
+<div id="lose" class="menu">
+    <h1>💀 YOU LOSE</h1>
+    <button onclick="restart()">Retry</button>
+    <button disabled>Settings</button>
+</div>
+
+<script>
+let playerHP = 100;
+let enemyHP = 100;
+let selectedPower = "";
+
+const powerList = [
+"Fire Style", "Ice Style", "Lightning Release", "Shadow Clone",
+"Sharingan", "Rasengan", "Chidori", "Bankai",
+"Getsuga Tenshou", "Spirit Gun", "Ultra Instinct",
+"Super Saiyan", "Domain Expansion", "Black Flash",
+"Time Stop", "Gravity Control", "Teleport",
+"Energy Blast", "Phoenix Flames", "Dragon Roar",
+"Dark Matter", "Blood Manipulation", "Mind Control",
+"Illusion Genjutsu", "Sword Aura", "Wind Cutter",
+"Earth Shatter", "Water Dragon", "Thunder God",
+"Void Step", "Cosmic Punch", "Soul Reap",
+"Infinity Barrier", "Explosion Art", "Demon Mode",
+"Angel Mode", "Chaos Burst", "Light Speed",
+"Shadow Possession", "Meteor Strike"
+];
+
+function show(menu) {
+    document.querySelectorAll(".menu").forEach(m => m.classList.remove("active"));
+    document.getElementById(menu).classList.add("active");
+}
+
+function goToPowers() {
+    show("powerMenu");
+}
+
+powerList.forEach(p => {
+    const div = document.createElement("div");
+    div.className = "power";
+    div.innerText = p;
+    div.onclick = () => {
+        selectedPower = p;
+        show("modeMenu");
+    };
+    document.getElementById("powers").appendChild(div);
+});
+
+function startAI() {
+    playerHP = 100;
+    enemyHP = 100;
+    updateHP();
+    show("battle");
+}
+
+function startOnline() {
+    alert("Online mode placeholder.\n(Real online requires servers)");
+    startAI(); // acts like AI for now
+}
+
+function updateHP() {
+    document.getElementById("playerHP").innerText = playerHP;
+    document.getElementById("enemyHP").innerText = enemyHP;
+}
+
+function attack() {
+    const playerDamage = Math.floor(Math.random() * 15) + 5;
+    const enemyDamage = Math.floor(Math.random() * 12) + 4;
+
+    enemyHP -= playerDamage;
+    if (enemyHP <= 0) {
+        show("win");
+        return;
+    }
+
+    playerHP -= enemyDamage;
+    if (playerHP <= 0) {
+        show("lose");
+        return;
+    }
+
+    updateHP();
+}
+
+function restart() {
+    show("mainMenu");
+}
+</script>
+
+</body>
+</html>
