@@ -14,40 +14,54 @@ io.on("connection", (socket) => {
   console.log("Player connected:", socket.id);
 
   socket.on("findOpponent", (playerData) => {
-    if (waitingPlayer) {
+    socket.playerData = playerData;
+
+    if (waitingPlayer && waitingPlayer !== socket) {
+      // Match players
       socket.opponent = waitingPlayer;
       waitingPlayer.opponent = socket;
 
       socket.emit("matched", waitingPlayer.playerData);
-      waitingPlayer.emit("matched", playerData);
+      waitingPlayer.emit("matched", socket.playerData);
 
       waitingPlayer = null;
     } else {
       waitingPlayer = socket;
-      socket.playerData = playerData;
+      socket.emit("waiting");
     }
   });
 
   socket.on("fight", () => {
-    if (socket.opponent) {
-      const winner =
-        Math.random() > 0.5 ? socket.id : socket.opponent.id;
+    if (!socket.opponent) return;
 
-      io.to(socket.id).emit("fightResult", winner === socket.id);
-      io.to(socket.opponent.id).emit(
-        "fightResult",
-        winner === socket.opponent.id
-      );
-    }
+    const winner =
+      Math.random() > 0.5 ? socket.id : socket.opponent.id;
+
+    socket.emit("fightResult", winner === socket.id);
+    socket.opponent.emit(
+      "fightResult",
+      winner === socket.opponent.id
+    );
   });
 
   socket.on("disconnect", () => {
+    console.log("Player disconnected:", socket.id);
+
+    // If waiting player disconnects
     if (waitingPlayer === socket) {
       waitingPlayer = null;
+    }
+
+    // If matched player disconnects
+    if (socket.opponent) {
+      socket.opponent.emit("opponentLeft");
+      socket.opponent.opponent = null;
     }
   });
 });
 
-server.listen(3000, () => {
-  console.log("Server running on port 3000");
+const PORT = process.env.PORT || 3000;
+
+server.listen(PORT, () => {
+  console.log("Server running on port " + PORT);
 });
