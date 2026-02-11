@@ -1,0 +1,37 @@
+<script src="/socket.io/socket.io.js"></script>
+<script>
+const socket = io();
+
+let player = {};
+let enemy = {};
+
+function createPower() {
+  player.name = document.getElementById('powerName').value;
+  player.type = document.getElementById('powerType').value;
+  player.strength = document.getElementById('strength').value;
+
+  document.getElementById('powerResult').innerText =
+    "Power Created: " + player.name + " (" + player.type + ")";
+}
+
+function findOpponent() {
+  socket.emit("findOpponent", player);
+}
+
+socket.on("matched", (enemyData) => {
+  enemy = enemyData;
+
+  document.getElementById("enemyName").innerText = "Online Player";
+  document.getElementById("enemyPower").innerText = enemy.name;
+  document.getElementById("enemyStrength").innerText = enemy.strength;
+});
+
+function fight() {
+  socket.emit("fight");
+}
+
+socket.on("fightResult", (won) => {
+  const log = document.getElementById("battleLog");
+  log.innerText = won ? "🔥 You Won!" : "💀 You Lost!";
+});
+</script>
