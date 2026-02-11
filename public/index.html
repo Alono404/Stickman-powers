@@ -1,5 +1,14 @@
 <script src="/socket.io/socket.io.js"></script>
 <script>
+  socket.on("waiting", () => {
+  document.getElementById("enemyName").innerText = "Searching...";
+});
+
+socket.on("opponentLeft", () => {
+  document.getElementById("battleLog").innerText =
+    "Opponent disconnected!";
+});
+
 const socket = io();
 
 let player = {};
